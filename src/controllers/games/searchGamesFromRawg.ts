@@ -8,8 +8,6 @@ export const searchGamesFromRawg = {
   async searchGame(req: FastifyRequest, res: FastifyReply) {
     const { id } = req.params as { id: string };
 
-    console.log("Chegou a requisição!")
-
     function gerarSlug(nome: string): string {
       nome = nome.replace(/\s*\([^)]*\)/g, '');
   
