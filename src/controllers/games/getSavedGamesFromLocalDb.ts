@@ -8,8 +8,6 @@ export const getSavedGamesFromLocalDb= {
   
   const gameName = nameNormalizer(id)
 
-  console.log("\n Como o nome chegou: " + id + "\n" + "nome normalizado para busca " + gameName)
-
     if (!gameName) {
       return res.status(400).send({ error: 'A name for the game is needed' });
     }

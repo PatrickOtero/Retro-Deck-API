@@ -1,10 +1,3 @@
-/*
-  Warnings:
-
-  - The primary key for the `Emulator` table will be changed. If it partially fails, the table could be left without primary key constraint.
-  - The primary key for the `Game` table will be changed. If it partially fails, the table could be left without primary key constraint.
-
-*/
 -- AlterTable
 ALTER TABLE "Emulator" DROP CONSTRAINT "Emulator_pkey",
 ALTER COLUMN "id" DROP DEFAULT,

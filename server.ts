@@ -1,10 +1,16 @@
 import Fastify from 'fastify';
 import dotenv from 'dotenv';
 import { gameRoutes } from './gameRoutes';
+import cors from "@fastify/cors"
 
 dotenv.config();
 
 const fastify = Fastify();
+
+fastify.register(cors, {
+  origin: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+});
 
 fastify.register(gameRoutes);
 

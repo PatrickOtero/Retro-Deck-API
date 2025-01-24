@@ -8,7 +8,7 @@ export const searchGamesFromRawg = {
   async searchGame(req: FastifyRequest, res: FastifyReply) {
     const { id } = req.params as { id: string };
 
-    console.log("Fui executada, id procurado: " + id)
+    console.log("Chegou a requisição!")
 
     function gerarSlug(nome: string): string {
       nome = nome.replace(/\s*\([^)]*\)/g, '');
@@ -26,8 +26,6 @@ export const searchGamesFromRawg = {
   
   const gameSlug = gerarSlug(id)
 
-  console.log("\n Como o nome chegou: " + id + "\n" + "nome transformado em slug " + gameSlug)
-
     const RAWG_API_KEY = process.env.RAWG_API_KEY;
 
     if (!RAWG_API_KEY) {
@@ -36,6 +34,18 @@ export const searchGamesFromRawg = {
 
     if (!gameSlug) {
       return res.status(400).send({ error: 'An id or a slug for the game is needed' });
+    }
+
+    const gameName = nameNormalizer(id)
+
+    const gameExists = await prisma.game.findFirst({
+      where: {
+        gameName
+      }
+    });
+
+    if (gameExists) {
+      return res.status(400).send({message: "This game info was already saved on database"})
     }
 
     try {
@@ -61,18 +71,8 @@ export const searchGamesFromRawg = {
 
         return res.status(404).send({ message: 'Game data incomplete from RAWG' });
       }
+
       const gameName = nameNormalizer(gameData.name)
-
-      const gameExists = await prisma.game.findFirst({
-        where: {
-          gameName
-        }
-      });
-
-      if (gameExists) {
-        return res.status(400).send({message: "This game info was already saved on database"})
-      }
-
       
       const game = await prisma.game.create({
         data: {
@@ -82,13 +82,9 @@ export const searchGamesFromRawg = {
         },
       });
 
-      console.log(game)
-
       return res.status(200).send({game, localDb: false});
     } catch (error: any) {
       const gameName = nameNormalizer(id)
-
-      console.error('Erro ao buscar ou salvar o jogo:', error.response?.data || error.message);
 
       await prisma.game.create({
         data: {
