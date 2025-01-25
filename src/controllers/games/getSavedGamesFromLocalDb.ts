@@ -8,8 +8,6 @@ export const getSavedGamesFromLocalDb= {
   
   const gameName = nameNormalizer(id)
 
-  console.log("requisição recebida:" + gameName)
-
     if (!gameName) {
       return res.status(400).send({ error: 'A name for the game is needed' });
     }
@@ -26,11 +24,9 @@ export const getSavedGamesFromLocalDb= {
         return res.status(404).send({ message: gameName + ": " + "Game not found"});
       }
 
-      console.log("Encontrado no banco remoto")
-
       return res.status(200).send({ game, localDB: true });
     } catch (error: any) {
-      console.error('Erro ao buscar o jogo no banco de dados:', error.response?.data || error.message);
+      console.error('Error when searching the game on the remote database:', error.response?.data || error.message);
 
       return res.status(500).send({
         error: 'Internal server error',

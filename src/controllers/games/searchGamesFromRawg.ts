@@ -46,8 +46,6 @@ export const searchGamesFromRawg = {
       return res.status(400).send({message: "This game info was already saved on database"})
     }
 
-    console.log(gameSlug + "Antes de fazer requisição pra rawg")
-
     try {
       const response = await axios.get(`https://api.rawg.io/api/games/${gameSlug}`, {
         params: {
@@ -58,8 +56,6 @@ export const searchGamesFromRawg = {
 
       
       const gameData = response.data;
-
-      console.log(gameData + "Depois de fazer requisição pra rawg")
 
       if (!gameData || !gameData.name || !gameData.description || !gameData.background_image) {
         const gameName = nameNormalizer(id)
@@ -89,7 +85,7 @@ export const searchGamesFromRawg = {
     } catch (error: any) {
       const gameName = nameNormalizer(id)
 
-      console.log(gameName + ": " + error.response?.data.detail)
+      console.log(gameName + ": " + error.response?.data.detail|| error.message)
 
       if (error.response?.data.detail === "Not found.") {
 
@@ -107,7 +103,7 @@ export const searchGamesFromRawg = {
         });
       }
 
-      console.log(error.response?.data)
+      console.log(error.response?.data || error.message)
       return res.status(500).send({
         error: 'Internal server error',
         details: error.response?.data || error.message,
