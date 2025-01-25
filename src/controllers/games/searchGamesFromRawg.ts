@@ -46,6 +46,8 @@ export const searchGamesFromRawg = {
       return res.status(400).send({message: "This game info was already saved on database"})
     }
 
+    console.log(gameSlug + "Antes de fazer requisição pra rawg")
+
     try {
       const response = await axios.get(`https://api.rawg.io/api/games/${gameSlug}`, {
         params: {
@@ -54,10 +56,13 @@ export const searchGamesFromRawg = {
         },
       });
 
+      
       const gameData = response.data;
 
+      console.log(gameData + "Depois de fazer requisição pra rawg")
+
       if (!gameData || !gameData.name || !gameData.description || !gameData.background_image) {
-        const gameName = nameNormalizer(gameData.name)
+        const gameName = nameNormalizer(id)
       
         await prisma.game.create({
           data: {
@@ -70,7 +75,7 @@ export const searchGamesFromRawg = {
         return res.status(404).send({ message: 'Game data incomplete from RAWG' });
       }
 
-      const gameName = nameNormalizer(gameData.name)
+      const gameName = nameNormalizer(id)
       
       const game = await prisma.game.create({
         data: {
@@ -84,14 +89,25 @@ export const searchGamesFromRawg = {
     } catch (error: any) {
       const gameName = nameNormalizer(id)
 
-      await prisma.game.create({
-        data: {
-          gameName: gameName,
-          description: "no info from rawg",
-          backgroundImage: "no info from rawg"
-        },
-      });
+      console.log(gameName + ": " + error.response?.data.detail)
 
+      if (error.response?.data.detail === "Not found.") {
+
+        await prisma.game.create({
+          data: {
+            gameName: gameName,
+            description: "no info from rawg",
+            backgroundImage: "no info from rawg"
+          },
+        });
+
+        return res.status(404).send({
+          message: 'Game ' + gameName + ' was not found on RAWG. Saved on remote database with generic informations',
+          details: "Details from RAWG API: " + error.response?.data || error.message,
+        });
+      }
+
+      console.log(error.response?.data)
       return res.status(500).send({
         error: 'Internal server error',
         details: error.response?.data || error.message,
